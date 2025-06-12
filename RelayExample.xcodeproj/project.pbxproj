@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		22A0B7042D8A1CDD00B15CB3 /* Relay in Frameworks */ = {isa = PBXBuildFile; productRef = 22A0B7032D8A1CDD00B15CB3 /* Relay */; };
+		22B90D302DFB351B0031ECA1 /* MarkdownUI in Frameworks */ = {isa = PBXBuildFile; productRef = 22B90D2F2DFB351B0031ECA1 /* MarkdownUI */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -57,6 +58,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				22A0B7042D8A1CDD00B15CB3 /* Relay in Frameworks */,
+				22B90D302DFB351B0031ECA1 /* MarkdownUI in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -83,6 +85,7 @@
 				22A0B6D52D8A15F400B15CB3 /* RelayExample */,
 				22A0B6E72D8A15F700B15CB3 /* RelayExampleTests */,
 				22A0B6F12D8A15F700B15CB3 /* RelayExampleUITests */,
+				22B90D2E2DFB351B0031ECA1 /* Frameworks */,
 				22A0B6D42D8A15F400B15CB3 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -95,6 +98,13 @@
 				22A0B6EE2D8A15F700B15CB3 /* RelayExampleUITests.xctest */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		22B90D2E2DFB351B0031ECA1 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = Frameworks;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -118,6 +128,7 @@
 			name = RelayExample;
 			packageProductDependencies = (
 				22A0B7032D8A1CDD00B15CB3 /* Relay */,
+				22B90D2F2DFB351B0031ECA1 /* MarkdownUI */,
 			);
 			productName = RelayExample;
 			productReference = 22A0B6D32D8A15F400B15CB3 /* RelayExample.app */;
@@ -203,6 +214,7 @@
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
 				225E675D2D8DBF3200CDB04D /* XCLocalSwiftPackageReference "../relay" */,
+				22B90D2D2DFB32140031ECA1 /* XCRemoteSwiftPackageReference "swift-markdown-ui" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 22A0B6D42D8A15F400B15CB3 /* Products */;
@@ -558,10 +570,26 @@
 		};
 /* End XCLocalSwiftPackageReference section */
 
+/* Begin XCRemoteSwiftPackageReference section */
+		22B90D2D2DFB32140031ECA1 /* XCRemoteSwiftPackageReference "swift-markdown-ui" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/gonzalezreal/swift-markdown-ui";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 2.4.1;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
 /* Begin XCSwiftPackageProductDependency section */
 		22A0B7032D8A1CDD00B15CB3 /* Relay */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = Relay;
+		};
+		22B90D2F2DFB351B0031ECA1 /* MarkdownUI */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 22B90D2D2DFB32140031ECA1 /* XCRemoteSwiftPackageReference "swift-markdown-ui" */;
+			productName = MarkdownUI;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

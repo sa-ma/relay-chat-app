@@ -1,5 +1,6 @@
 import SwiftUI
 import Relay
+import MarkdownUI
 
 struct Message: Identifiable {
     let id = UUID()
@@ -511,13 +512,40 @@ struct MessageBubble: View {
             }
             
             VStack(alignment: message.isUser ? .trailing : .leading) {
-                Text(message.content)
-                    .padding(.horizontal, 12)
-                    .padding(.vertical, 8)
-                    .background(message.isUser ? Color.blue : Color.gray.opacity(0.2))
-                    .foregroundColor(message.isUser ? .white : .primary)
-                    .cornerRadius(12)
-                    .textSelection(.enabled)
+                if message.isUser {
+                    // User messages remain as plain text
+                    Text(message.content)
+                        .padding(.horizontal, 12)
+                        .padding(.vertical, 8)
+                        .background(Color.blue)
+                        .foregroundColor(.white)
+                        .cornerRadius(12)
+                        .textSelection(.enabled)
+                } else {
+                    // AI messages rendered as markdown
+                    Markdown(message.content)
+                        .padding(.horizontal, 12)
+                        .padding(.vertical, 8)
+                        .background(Color.gray.opacity(0.2))
+                        .foregroundColor(.primary)
+                        .cornerRadius(12)
+                        .textSelection(.enabled)
+                        .markdownTextStyle(\.text) {
+                            FontFamilyVariant(.normal)
+                            FontSize(.em(0.95))
+                        }
+                        .markdownBlockStyle(\.codeBlock) { configuration in
+                            configuration.label
+                                .padding()
+                                .markdownTextStyle {
+                                    FontFamilyVariant(.monospaced)
+                                    FontSize(.em(0.85))
+                                }
+                                .background(Color.gray.opacity(0.1))
+                                .clipShape(RoundedRectangle(cornerRadius: 8))
+                        }
+                        .markdownInlineImageProvider(.asset)
+                }
             }
             
             if !message.isUser {
