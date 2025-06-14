@@ -15,50 +15,29 @@ struct Conversation: Identifiable {
     var conversationId: String?
 }
 
-// Simple stream handler implementation
+// Simplified handler for conversation completion
 class ExampleStreamHandler: ConversationStreamHandler {
-    let onMessageReceived: (String) -> Void
-    let onCompletedCallback: () -> Void
+    let onCompletedCallback: (ConversationDetailResponse) -> Void
     let onErrorCallback: (Error) -> Void
     
-    init(onMessage: @escaping (String) -> Void, onComplete: @escaping () -> Void, onError: @escaping (Error) -> Void) {
-        self.onMessageReceived = onMessage
+    init(onComplete: @escaping (ConversationDetailResponse) -> Void, 
+         onError: @escaping (Error) -> Void) {
         self.onCompletedCallback = onComplete
         self.onErrorCallback = onError
     }
     
-    func onStructuredResponse(_ response: StructuredStreamingResponse) {
-        print("Received structured response: \(response)")
-        // Handle streaming text content
-        if let textContent = response.textContent, !textContent.isEmpty {
-            print("Received text content: \(textContent)")
-            onMessageReceived(textContent)
-        }
-    }
-    
-    func onDelta(_ delta: DeltaEventData) {
-        // Handle legacy delta events
-        if let content = delta.v?.value as? String {
-            onMessageReceived(content)
-        }
-    }
-    
-    func onMessageComplete(conversationId: String) {
-        print("Message completed for conversation: \(conversationId)")
-    }
-    
-    func onTitleGeneration(title: String, conversationId: String) {
-        print("Title generated: \(title) for conversation: \(conversationId)")
+    func onConversationComplete(_ conversation: ConversationDetailResponse) {
+        print("🎯 Received complete conversation:")
+        print("  - Title: \(conversation.title)")
+        print("  - Messages: \(conversation.messages.count)")
+        
+        // Send the complete conversation data to the callback
+        onCompletedCallback(conversation)
     }
     
     func onError(_ error: Error) {
-        print("Stream handler error: \(error)")
+        print("Handler error: \(error)")
         onErrorCallback(error)
-    }
-    
-    func onComplete() {
-        print("Stream completed")
-        onCompletedCallback()
     }
 }
 
@@ -72,6 +51,7 @@ struct RelayExampleView: View {
     @State private var availableModels: [ModelItem] = []
     @State private var selectedModel: String = "auto"
     @State private var isAuthenticated: Bool = false
+    @State private var isDebugView: Bool = false
     
     // Remote History State
     @State private var conversationHistory: [ConversationItem] = []
@@ -91,6 +71,20 @@ struct RelayExampleView: View {
                         .font(.caption)
                         .foregroundColor(isAuthenticated ? .green : .red)
                     Spacer()
+                    Toggle("Debug View", isOn: $isDebugView)
+                        .toggleStyle(.switch)
+                        .controlSize(.small)
+                        .onChange(of: isDebugView) { _, newValue in
+                            if let client = openAIClient {
+                                Relay.shared.isDebugView = newValue
+                                // Force window visibility update
+                                if newValue {
+                                    client.showWindow()
+                                } else if isAuthenticated {
+                                    client.hideWindow()
+                                }
+                            }
+                        }
                     if !isAuthenticated {
                         Button("Authenticate") {
                             authenticate()
@@ -237,19 +231,15 @@ struct RelayExampleView: View {
         .onAppear {
             initializeRelay()
         }
-        .alert("Error", isPresented: .constant(errorMessage != nil)) {
-            Button("OK") {
-                errorMessage = nil
-            }
-        } message: {
-            Text(errorMessage ?? "")
-        }
     }
     
     private func initializeRelay() {
         print("Initializing Relay...")
         // Initialize OpenAI client using the new API
         openAIClient = Relay.OpenAI(autoInitialize: true)
+        
+        // Set initial debug view state
+        isDebugView = Relay.shared.isDebugView
         
         // Check authentication status periodically
         checkAuthenticationStatus()
@@ -307,7 +297,7 @@ struct RelayExampleView: View {
                         print("Need to authenticate first for models")
                         self.isAuthenticated = false
                     } else {
-                        self.errorMessage = "Failed to fetch models: \(error.localizedDescription)"
+                        print("Error fetching models: \(error.localizedDescription)")
                     }
                 }
             }
@@ -335,7 +325,12 @@ struct RelayExampleView: View {
                         print("Need to authenticate first for history")
                         self.isAuthenticated = false
                     } else {
-                        self.errorMessage = "Failed to fetch history: \(error.localizedDescription)"
+                        print("❌ Failed to fetch history: \(error)")
+                        if let relayError = error as? RelayProviderError,
+                           case .authenticationRequired = relayError {
+                            print("Need to authenticate first for history")
+                            self.isAuthenticated = false
+                        }
                     }
                 }
             }
@@ -394,7 +389,12 @@ struct RelayExampleView: View {
                         print("Need to authenticate first for conversation detail")
                         self.isAuthenticated = false
                     } else {
-                        self.errorMessage = "Failed to fetch conversation: \(error.localizedDescription)"
+                        print("❌ Failed to fetch conversation: \(error)")
+                        if let relayError = error as? RelayProviderError,
+                           case .authenticationRequired = relayError {
+                            print("Need to authenticate first for conversation")
+                            self.isAuthenticated = false
+                        }
                     }
                 }
             }
@@ -426,32 +426,29 @@ struct RelayExampleView: View {
         currentMessage = ""
         isLoading = true
         
-        // Prepare for AI response
-        var aiMessageContent = ""
-        
         let handler = ExampleStreamHandler(
-            onMessage: { content in
+            onComplete: { conversationDetail in
                 DispatchQueue.main.async {
-                    aiMessageContent += content
+                    print("🎯 Updating conversation with complete data")
                     
-                    // Update or add AI message
-                    if var updatedConversation = self.currentConversation {
-                        if let lastMessage = updatedConversation.messages.last, !lastMessage.isUser {
-                            // Update existing AI message
-                            updatedConversation.messages[updatedConversation.messages.count - 1] = 
-                                Message(content: aiMessageContent, isUser: false)
-                        } else {
-                            // Add new AI message
-                            updatedConversation.messages.append(
-                                Message(content: aiMessageContent, isUser: false)
-                            )
-                        }
-                        self.currentConversation = updatedConversation
+                    // Convert the ConversationMessage objects to our local Message objects
+                    let completeMessages = conversationDetail.messages.map { conversationMessage in
+                        Message(
+                            content: conversationMessage.content.parts.joined(separator: "\n"),
+                            isUser: conversationMessage.author.role == "user"
+                        )
                     }
-                }
-            },
-            onComplete: {
-                DispatchQueue.main.async {
+                    
+                    // Update the conversation with complete data
+                    if var updatedConversation = self.currentConversation {
+                        updatedConversation.messages = completeMessages
+                        updatedConversation.title = conversationDetail.title
+                        updatedConversation.conversationId = conversationDetail.id
+                        self.currentConversation = updatedConversation
+                        
+                        print("✅ Updated conversation with \(completeMessages.count) complete messages")
+                    }
+                    
                     self.isLoading = false
                     // Refresh history to get updated conversation list
                     self.fetchHistory()
@@ -469,8 +466,12 @@ struct RelayExampleView: View {
                         // The client will automatically show auth window when needed
                         self.fetchModels()
                     } else {
-                        print("Non-auth error: \(error.localizedDescription)")
-                        self.errorMessage = "Error: \(error.localizedDescription)"
+                        print("❌ Error: \(error.localizedDescription)")
+                        if let relayError = error as? RelayProviderError,
+                           case .authenticationRequired = relayError {
+                            print("Need to authenticate first for sending message")
+                            self.isAuthenticated = false
+                        }
                     }
                 }
             }
