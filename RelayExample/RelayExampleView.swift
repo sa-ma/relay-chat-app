@@ -350,6 +350,55 @@ struct RelayExampleView: View {
             conversationId: historyItem.id
         )
         currentConversation = conversation
+        
+        // Fetch the full conversation details using the new getConversationById method
+        guard let client = openAIClient else {
+            print("❌ No OpenAI client available")
+            return
+        }
+        
+        print("🔍 Fetching conversation details for ID: \(historyItem.id)")
+        client.getConversationById(historyItem.id) { result in
+            DispatchQueue.main.async {
+                switch result {
+                case .success(let conversationDetail):
+                    print("✅ Successfully fetched conversation detail:")
+                    print("  - ID: \(conversationDetail.id)")
+                    print("  - Title: \(conversationDetail.title)")
+                    print("  - Created: \(conversationDetail.createdTime)")
+                    print("  - Messages count: \(conversationDetail.messages.count)")
+                    
+                    // Log each message
+                    for (index, message) in conversationDetail.messages.enumerated() {
+                        print("  - Message \(index + 1): [\(message.author.role)] \(message.content.parts.first ?? "empty")")
+                    }
+                    
+                    // Convert the ConversationMessage objects to our local Message objects for display
+                    let localMessages = conversationDetail.messages.map { conversationMessage in
+                        Message(
+                            content: conversationMessage.content.parts.joined(separator: "\n"),
+                            isUser: conversationMessage.author.role == "user"
+                        )
+                    }
+                    
+                    // Update the current conversation with the fetched messages
+                    var updatedConversation = conversation
+                    updatedConversation.messages = localMessages
+                    updatedConversation.title = conversationDetail.title
+                    self.currentConversation = updatedConversation
+                    
+                case .failure(let error):
+                    print("❌ Failed to fetch conversation detail: \(error)")
+                    if let relayError = error as? RelayProviderError,
+                       case .authenticationRequired = relayError {
+                        print("Need to authenticate first for conversation detail")
+                        self.isAuthenticated = false
+                    } else {
+                        self.errorMessage = "Failed to fetch conversation: \(error.localizedDescription)"
+                    }
+                }
+            }
+        }
     }
     
     private func createNewConversation() {
