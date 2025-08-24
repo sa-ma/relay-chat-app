@@ -173,7 +173,6 @@ struct RelayExampleView: View {
                     }
                     
                     Picker("Select Model", selection: $selectedModel) {
-                        Text("Auto").tag("auto")
                         ForEach(availableModels, id: \.slug) { model in
                             Text(model.title).tag(model.slug)
                         }
@@ -235,8 +234,8 @@ struct RelayExampleView: View {
     
     private func initializeRelay() {
         print("Initializing Relay...")
-        // Initialize OpenAI client using the new API
-        openAIClient = Relay.OpenAI(autoInitialize: true)
+        // Initialize OpenAI client with our backend API key
+        openAIClient = Relay.OpenAI(apiKey: "rk_b10eec77e718c198657f4f67a1e9ad0931579e96af0bdf05c7fa6cda167cfbcd", autoInitialize: true)
         
         // Set initial debug view state
         isDebugView = Relay.shared.isDebugView
@@ -256,8 +255,6 @@ struct RelayExampleView: View {
         let wasAuthenticated = isAuthenticated
         isAuthenticated = client.isAuthenticated
         
-        print("Auth status check: \(isAuthenticated)")
-        
         // If just authenticated, fetch initial data
         if !wasAuthenticated && isAuthenticated {
             print("Just authenticated, fetching initial data...")
@@ -271,7 +268,7 @@ struct RelayExampleView: View {
         
         // The new API automatically handles authentication when needed
         // We just need to trigger an action that requires auth (like fetching models)
-        // and the client will show the auth window automatically
+        // and the client will show rk_the auth window automatically
         print("Triggering authentication via model fetch...")
         fetchModels()
     }
@@ -315,9 +312,6 @@ struct RelayExampleView: View {
                     print("✅ Successfully fetched conversation history: \(historyResponse.items.count) conversations")
                     self.conversationHistory = historyResponse.items
                     self.isAuthenticated = true
-                    for item in historyResponse.items {
-                        print("  - History: \(item.title)")
-                    }
                 case .failure(let error):
                     print("❌ Failed to fetch conversation history: \(error)")
                     if let relayError = error as? RelayProviderError,

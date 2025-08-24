@@ -7,7 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		22A0B7042D8A1CDD00B15CB3 /* Relay in Frameworks */ = {isa = PBXBuildFile; productRef = 22A0B7032D8A1CDD00B15CB3 /* Relay */; };
+		226AA4FB2E5B964D00D3E66E /* Relay.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 226AA4F92E5B964500D3E66E /* Relay.framework */; };
+		226AA4FC2E5B964D00D3E66E /* Relay.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 226AA4F92E5B964500D3E66E /* Relay.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		22B90D302DFB351B0031ECA1 /* MarkdownUI in Frameworks */ = {isa = PBXBuildFile; productRef = 22B90D2F2DFB351B0031ECA1 /* MarkdownUI */; };
 /* End PBXBuildFile section */
 
@@ -28,7 +29,22 @@
 		};
 /* End PBXContainerItemProxy section */
 
+/* Begin PBXCopyFilesBuildPhase section */
+		227048A62E5B8F1100CBD145 /* Embed Frameworks */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				226AA4FC2E5B964D00D3E66E /* Relay.framework in Embed Frameworks */,
+			);
+			name = "Embed Frameworks";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
 /* Begin PBXFileReference section */
+		226AA4F92E5B964500D3E66E /* Relay.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Relay.framework; sourceTree = "<group>"; };
 		22A0B6D32D8A15F400B15CB3 /* RelayExample.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = RelayExample.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		22A0B6E42D8A15F700B15CB3 /* RelayExampleTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = RelayExampleTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		22A0B6EE2D8A15F700B15CB3 /* RelayExampleUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = RelayExampleUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -57,7 +73,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				22A0B7042D8A1CDD00B15CB3 /* Relay in Frameworks */,
+				226AA4FB2E5B964D00D3E66E /* Relay.framework in Frameworks */,
 				22B90D302DFB351B0031ECA1 /* MarkdownUI in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -82,10 +98,10 @@
 		22A0B6CA2D8A15F400B15CB3 = {
 			isa = PBXGroup;
 			children = (
+				226AA4F92E5B964500D3E66E /* Relay.framework */,
 				22A0B6D52D8A15F400B15CB3 /* RelayExample */,
 				22A0B6E72D8A15F700B15CB3 /* RelayExampleTests */,
 				22A0B6F12D8A15F700B15CB3 /* RelayExampleUITests */,
-				22B90D2E2DFB351B0031ECA1 /* Frameworks */,
 				22A0B6D42D8A15F400B15CB3 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -100,13 +116,6 @@
 			name = Products;
 			sourceTree = "<group>";
 		};
-		22B90D2E2DFB351B0031ECA1 /* Frameworks */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			name = Frameworks;
-			sourceTree = "<group>";
-		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -117,6 +126,7 @@
 				22A0B6CF2D8A15F400B15CB3 /* Sources */,
 				22A0B6D02D8A15F400B15CB3 /* Frameworks */,
 				22A0B6D12D8A15F400B15CB3 /* Resources */,
+				227048A62E5B8F1100CBD145 /* Embed Frameworks */,
 			);
 			buildRules = (
 			);
@@ -127,7 +137,6 @@
 			);
 			name = RelayExample;
 			packageProductDependencies = (
-				22A0B7032D8A1CDD00B15CB3 /* Relay */,
 				22B90D2F2DFB351B0031ECA1 /* MarkdownUI */,
 			);
 			productName = RelayExample;
@@ -213,7 +222,6 @@
 			mainGroup = 22A0B6CA2D8A15F400B15CB3;
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
-				225E675D2D8DBF3200CDB04D /* XCLocalSwiftPackageReference "../relay" */,
 				22B90D2D2DFB32140031ECA1 /* XCRemoteSwiftPackageReference "swift-markdown-ui" */,
 			);
 			preferredProjectObjectVersion = 77;
@@ -414,11 +422,17 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = RelayExample/RelayExample.entitlements;
+				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"RelayExample/Preview Content\"";
+				DEVELOPMENT_TEAM = 762U5G7236;
 				ENABLE_PREVIEWS = YES;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)",
+				);
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -426,8 +440,9 @@
 					"@executable_path/../Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.relay.app.RelayExample;
+				PRODUCT_BUNDLE_IDENTIFIER = com.relay.app.mac;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
 			};
@@ -439,11 +454,17 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = RelayExample/RelayExample.entitlements;
+				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"RelayExample/Preview Content\"";
+				DEVELOPMENT_TEAM = 762U5G7236;
 				ENABLE_PREVIEWS = YES;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)",
+				);
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -451,8 +472,9 @@
 					"@executable_path/../Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.relay.app.RelayExample;
+				PRODUCT_BUNDLE_IDENTIFIER = com.relay.app.mac;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
 			};
@@ -563,13 +585,6 @@
 		};
 /* End XCConfigurationList section */
 
-/* Begin XCLocalSwiftPackageReference section */
-		225E675D2D8DBF3200CDB04D /* XCLocalSwiftPackageReference "../relay" */ = {
-			isa = XCLocalSwiftPackageReference;
-			relativePath = ../relay;
-		};
-/* End XCLocalSwiftPackageReference section */
-
 /* Begin XCRemoteSwiftPackageReference section */
 		22B90D2D2DFB32140031ECA1 /* XCRemoteSwiftPackageReference "swift-markdown-ui" */ = {
 			isa = XCRemoteSwiftPackageReference;
@@ -582,10 +597,6 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
-		22A0B7032D8A1CDD00B15CB3 /* Relay */ = {
-			isa = XCSwiftPackageProductDependency;
-			productName = Relay;
-		};
 		22B90D2F2DFB351B0031ECA1 /* MarkdownUI */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 22B90D2D2DFB32140031ECA1 /* XCRemoteSwiftPackageReference "swift-markdown-ui" */;
